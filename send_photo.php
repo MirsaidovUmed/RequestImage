@@ -26,23 +26,22 @@ if (!isset($_SESSION['sent'])) {
 
 if (isset($_FILES['photo'])) {
     try {
+        $file = $_FILES['photo'];
         if ($_FILES['photo']['size'] > 2097152) {
             die('Ошибка Файл не должен быть больше 2 Мбайт.');
         }
 
-        $allowed_extensions = array('jpg', 'jpeg', 'png');
+        $allowed_extensions = ['jpg', 'jpeg', 'png'];
         $file_extension = pathinfo($_FILES['photo']['name'], PATHINFO_EXTENSION);
 
-        if (!in_array($file_extension, $allowed_extensions)) {
+        $mime_type = mime_content_type($file['tmp_name']);
+
+        if (!in_array($file_extension, $allowed_extensions) || !in_array($mime_type, ['image/jpg', 'image/jpeg', 'image/png'])) {
             die('Ошибка Разрешены только файлы с форматом .jpg и .png...');
         }
 
-        move_uploaded_file($_FILES['photo']['tmp_name'], './images/' . $_FILES['photo']['name']);
-        $_SESSION['sent']++;
-        header('Location: ./images/' . $_FILES['photo']['name']);
-        exit();
     } catch (Exception $e) {
-        echo $e->getMessage();
+        die('Ошибка ' . $e->getMessage());
     }
 }
 
